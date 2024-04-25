@@ -32,9 +32,9 @@ export const GameList = () => {
     <>
       { 
         isLoading && 
-        <div class="d-flex justify-content-center">
-          <div class="spinner-border">
-            <span class="visually-hidden"></span>
+        <div className="d-flex justify-content-center">
+          <div className="spinner-border">
+            <span className="visually-hidden"></span>
           </div>
         </div>
       }
