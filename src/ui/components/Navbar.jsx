@@ -28,7 +28,7 @@ export const Navbar = () => {
             </li>
           </ul>
           <span className="nav-item navbar-link text-primary">
-            {user?.email}
+            {user?.displayName}
           </span>
           <button className="nav-item nav-link btn text-light" onClick={() => onLogout()}>
             Logout

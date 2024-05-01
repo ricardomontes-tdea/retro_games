@@ -3,7 +3,7 @@ import { useReducer } from "react";
 import { AuthContext } from "./AuthContext";
 import { authReducer } from "../reducers";
 import { authTypes } from "../types";
-import { signInUser } from "../../firebase/providers";
+import { registerUser, signInUser } from "../../firebase/providers";
 
 const initialState = { logged: false };
 
@@ -19,6 +19,25 @@ export const AuthProvider = ({ children }) => {
   
   const [authState, dispatch ] = useReducer(authReducer, initialState, init);
 
+  const register = async (email, password, displayName) => { 
+    const { ok, uid, photoURL, errorMessage } = await registerUser({ email, password, displayName });
+
+    if (!ok) {
+      dispatch({ type: authTypes.error, payload: { errorMessage } });
+      return false;
+    }
+
+    const payload = { uid, email, photoURL, displayName };
+    
+    const action = { type: authTypes.login, payload };
+
+    localStorage.setItem('user', JSON.stringify(payload));
+
+    dispatch(action);
+
+    return true;
+  }
+
   const login = async (email = '', password = '') => {
 
     const { ok, uid, photoURL, displayName, errorMessage } = await signInUser(email, password)
@@ -28,7 +47,7 @@ export const AuthProvider = ({ children }) => {
       return false;
     }
 
-    const payload = { uid, email, photoURL, displayName, email }
+    const payload = { uid, email, photoURL, displayName }
     
     const action = { type: authTypes.login, payload }
 
@@ -49,6 +68,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={
       {
         ...authState,
+        register: register,
         login: login,
         logout: logout
       }
