@@ -11,7 +11,7 @@ const initForm = {
 };
 
 export const LoginPage = () => {
-  const { login, errorMessage } = useContext(AuthContext)
+  const { login, googleLogin, errorMessage } = useContext(AuthContext)
 
   const navigate = useNavigate();
 
@@ -21,6 +21,17 @@ export const LoginPage = () => {
     event.preventDefault();
 
     const isValidLogin = await login(email, password);
+    
+    if(isValidLogin) {
+      const lastPath = localStorage.getItem('lastPath') || '/'
+      navigate(lastPath, { replace: true })
+    };
+  }
+
+  const onLoginWithGoogle = async (event) => { 
+    event.preventDefault();
+
+    const isValidLogin = await googleLogin();
     
     if(isValidLogin) {
       const lastPath = localStorage.getItem('lastPath') || '/'
@@ -61,13 +72,22 @@ export const LoginPage = () => {
                       placeholder="Enter Password" 
                     />
                   </div>
-                  <button 
-                    type="submit" 
-                    className="btn btn-primary btn-block"
-                    onClick={onLogin}
-                  >
-                    Login user
-                  </button>
+                  <div className="form-row">
+                    <button 
+                      type="submit" 
+                      className="btn btn-primary btn-block"
+                      onClick={onLogin}
+                    >
+                      Login user
+                    </button>
+                    <button 
+                      type="submit" 
+                      className="btn btn-primary btn-block"
+                      onClick={onLoginWithGoogle}
+                    >
+                      Login with google
+                    </button>
+                  </div>
                   <br />
                   { !errorMessage ? null : 
                     <div 

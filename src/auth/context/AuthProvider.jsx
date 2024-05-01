@@ -3,7 +3,7 @@ import { useReducer } from "react";
 import { AuthContext } from "./AuthContext";
 import { authReducer } from "../reducers";
 import { authTypes } from "../types";
-import { registerUser, signInUser } from "../../firebase/providers";
+import { logoutUser, registerUser, signInUser, signInWithGoogle } from "../../firebase/providers";
 
 const initialState = { logged: false };
 
@@ -18,6 +18,27 @@ const init = () => {
 export const AuthProvider = ({ children }) => {
   
   const [authState, dispatch ] = useReducer(authReducer, initialState, init);
+
+  const googleLogin = async () => { 
+    const {ok, email: googleEmail, displayName, photoURL, uid, errorMessage } = await signInWithGoogle();
+    
+    if (!ok) {
+      dispatch({ type: authTypes.error, payload: { errorMessage } })
+      return false;
+    }
+
+    const payload = { uid, googleEmail, photoURL, displayName }
+    console.log(payload);
+    
+    const action = { type: authTypes.login, payload }
+
+    localStorage.setItem('user', JSON.stringify(payload))
+
+    dispatch(action);
+
+    return true;
+  }
+
 
   const register = async (email, password, displayName) => { 
     const { ok, uid, photoURL, errorMessage } = await registerUser({ email, password, displayName });
@@ -58,7 +79,8 @@ export const AuthProvider = ({ children }) => {
     return true;
   }
 
-  const logout = () => {
+  const logout = async () => {
+    await logoutUser();
     localStorage.removeItem('user')
     dispatch({ type: authTypes.logout })
   }
@@ -70,7 +92,8 @@ export const AuthProvider = ({ children }) => {
         ...authState,
         register: register,
         login: login,
-        logout: logout
+        googleLogin: googleLogin,
+        logout: logout,
       }
     }
     >
