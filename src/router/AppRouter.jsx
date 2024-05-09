@@ -3,6 +3,7 @@ import { LoginPage, RegisterPage } from '../auth'
 import { PublicRouter } from './PublicRouter'
 import { GamesRouter } from '../games/routes/GamesRouter'
 import { PrivateRouter } from './PrivateRouter'
+import { GamesProvider } from '../games/context'
 
 
 export const AppRouter = () => {
@@ -26,10 +27,12 @@ export const AppRouter = () => {
           </PublicRouter>
         }
       />
-
+  
       <Route path='/*' element={
         <PrivateRouter>
-          <GamesRouter />
+          <GamesProvider>
+            <GamesRouter />
+          </GamesProvider>
         </PrivateRouter>
       } />    
     </Routes>
